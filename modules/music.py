@@ -218,7 +218,7 @@ class MusicPlayer(commands.Cog):
                 await current.remove_reaction(react, user)
             except discord.HTTPException:
                 pass
-
+     
     async def player_loop(self):
         """Our main player loop."""
         await self.bot.wait_until_ready()
@@ -334,7 +334,25 @@ class Music(commands.Cog):
             self.players[ctx.guild.id] = player
 
         return player
+    @commands.command()
+    async def repeat(self,msg):
+        """
+        Repeat the currently playing or turn off by using the command again
+        `Ex:` .repeat
+        `Command:` repeat()
+        """
+        if msg.guild.id in self.player:
+            if msg.voice_client.is_playing() is True:
+                if self.player[msg.guild.id]['repeat'] is True:
+                    self.player[msg.guild.id]['repeat']=False
+                    return await msg.message.add_reaction(emoji='✅')
+                    
+                self.player[msg.guild.id]['repeat']=True
+                return await msg.message.add_reaction(emoji='✅')
 
+            return await msg.send("No audio currently playing")
+        return await msg.send("Bot not in voice channel or playing music")
+                       
     @commands.command(name='connect', aliases=['join', 'j'])
     async def connect_(self, ctx, *, channel: discord.VoiceChannel=None):
         """Connect to voice.
