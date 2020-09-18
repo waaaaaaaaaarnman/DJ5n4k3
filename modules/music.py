@@ -352,7 +352,24 @@ class Music(commands.Cog):
 
             return await msg.send("No audio currently playing")
         return await msg.send("Bot not in voice channel or playing music")
-                       
+    @commands.command()
+    async def reset(self,msg):
+        """
+        Restart the currently playing song  from the begining
+        `Ex:` s.reset
+        `Command:` reset()
+        """
+        if msg.voice_client is None:
+            return await msg.send(f"**{msg.author.display_name}, there is no audio currently playing from the bot.**")
+
+        if msg.author.voice is None or msg.author.voice.channel != msg.voice_client.channel:
+            return await msg.send(f"**{msg.author.display_name}, you must be in the same voice channel as the bot.**")
+
+        if self.player[msg.guild.id]['queue'] and msg.voice_client.is_playing() is False:
+            return await msg.send("**No audio currently playing or songs in queue**".title(),delete_after=25)
+
+        self.player[msg.guild.id]['reset']=True
+        msg.voice_client.stop()
     @commands.command(name='connect', aliases=['join', 'j'])
     async def connect_(self, ctx, *, channel: discord.VoiceChannel=None):
         """Connect to voice.
